@@ -3,8 +3,8 @@ Contributors: tollmanz
 Donate link: http://www.zackdev.com/
 Tags: taxonomy, category, sort
 Requires at least: 3.1
-Tested up to: 3.2.1
-Stable tag: 1.1.3
+Tested up to: 3.3
+Stable tag: 1.1.4
 
 Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 
@@ -65,6 +65,10 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 
 == Changelog ==
 
+= 1.1.4 =
+* Fixed situation where the plugin will conflict with other changes to the term page columns. Thanks to DUCK__BOY1981.
+* Updated code to comply with WordPress coding standards
+
 = 1.1.3 =
 * Fixed a potential situation where the custom sort does not work with "get_the_term_list". Thanks to [@anointed](http://wordpress.org/support/topic/plugin-custom-taxonomy-sort-get_the_term_list-not-using-sort?replies=4)
 
@@ -89,6 +93,9 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Updated for 3.3 compatibility
 
 = 1.1.3 =
 Fixed issue where sort may not be applied in certain situations
