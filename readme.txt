@@ -3,8 +3,8 @@ Contributors: tollmanz
 Donate link: http://www.zackdev.com/
 Tags: taxonomy, category, sort
 Requires at least: 3.1
-Tested up to: 3.2.1
-Stable tag: 1.1.3
+Tested up to: 3.3
+Stable tag: 1.1.5
 
 Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 
@@ -36,6 +36,8 @@ Voila! Now, your terms will only be sorted by the specified order in the places 
 * Thanks to Jacob M Goldman for his excellent [Simple Term Meta plugin](http://wordpress.org/extend/plugins/simple-term-meta/), which made programming the term meta quite simple. 
 * Thanks to hydrowire [for pointing out a bug](http://wordpress.org/support/topic/plugin-custom-taxonomy-sort-error-in-quick-edit-post) fixed in 1.1.1
 * Thanks to "Mosey" for pointing out a bug with a situation in which order did not work for a custom taxonomy
+* Thanks to DUCK__BOY1981 for pointing out a bug where the column values where overridden inappropriately
+* Thanks to @martindj for pointing out a bug where the column value returned incorrectly
 
 == Installation ==
 
@@ -65,6 +67,13 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 
 == Changelog ==
 
+= 1.1.5 =
+* Fixed bug with returning an inappropriate value for "column_value". Thanks to @martindj.
+
+= 1.1.4 =
+* Fixed situation where the plugin will conflict with other changes to the term page columns. Thanks to DUCK__BOY1981.
+* Updated code to comply with WordPress coding standards
+
 = 1.1.3 =
 * Fixed a potential situation where the custom sort does not work with "get_the_term_list". Thanks to [@anointed](http://wordpress.org/support/topic/plugin-custom-taxonomy-sort-get_the_term_list-not-using-sort?replies=4)
 
@@ -89,6 +98,12 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.1.5 =
+Fixed bug with column values
+
+= 1.1.4 =
+Updated for 3.3 compatibility
 
 = 1.1.3 =
 Fixed issue where sort may not be applied in certain situations
