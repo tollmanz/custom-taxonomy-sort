@@ -5,7 +5,7 @@ Plugin URI: http://www.zackdev.com
 Description: Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 Author: Zack Tollman
 Author URI: https://twitter.com/#!/zack_dev
-Version: 1.1.4
+Version: 1.1.5
 
 Plugin: Copyright 2011 Zack Tollman (email: zack [at] zackdev [dot] com)
 
@@ -660,8 +660,6 @@ class CustomTaxonomySort {
 	function column_value( $empty = '', $custom_column, $term_id ) {
         if ( 'order' == $custom_column )
 		    return get_term_meta( $term_id, 'tax-order', true );
-        else
-            return $custom_column;
 	}
 	
 	/**
