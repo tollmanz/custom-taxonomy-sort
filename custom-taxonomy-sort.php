@@ -291,6 +291,12 @@ class CustomTaxonomySort {
 	 * @return int|array
 	 */
 	function get_terms( $terms, $taxonomies, $args ) {
+
+		$args = wp_parse_args( $args, array(
+			'orderby' => '',
+			'order'   => ''
+		) );
+
 		// If the current control type is not automatic, return the terms unless it's explicitly set to be sorted by custom_sort
 		if ( $this->get_control_type() == 'off' && $args['orderby'] != $this->orderby_parameter ) return $terms;
 	
