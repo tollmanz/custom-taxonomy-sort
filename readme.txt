@@ -16,7 +16,7 @@ Surprisingly, WordPress does not provide a mechanism for sorting taxonomies by a
 2. Fill in a numeric value for the "Order" field. By default, the order will be ascending, meaning it will sort from low to high (e.g., 1, 2, 3). These values can be added on the Add Taxonomy screen, the Edit Taxonomy screen, or through the Quick Edit panel.
 3. Observe all of your terms automagically being sorted in the order you specified
 
-Custom Taxonomy Sort automatically applies the sort order to all instances in which the terms are displayed. All you need to do is define that order. 
+Custom Taxonomy Sort automatically applies the sort order to all instances in which the terms are displayed. All you need to do is define that order.
 
 = Manual Mode =
 
@@ -33,7 +33,7 @@ Voila! Now, your terms will only be sorted by the specified order in the places 
 
 = Acknowledgements =
 
-* Thanks to Jacob M Goldman for his excellent [Simple Term Meta plugin](http://wordpress.org/extend/plugins/simple-term-meta/), which made programming the term meta quite simple. 
+* Thanks to Jacob M Goldman for his excellent [Simple Term Meta plugin](http://wordpress.org/extend/plugins/simple-term-meta/), which made programming the term meta quite simple.
 * Thanks to hydrowire [for pointing out a bug](http://wordpress.org/support/topic/plugin-custom-taxonomy-sort-error-in-quick-edit-post) fixed in 1.1.1
 * Thanks to "Mosey" for pointing out a bug with a situation in which order did not work for a custom taxonomy
 * Thanks to DUCK__BOY1981 for pointing out a bug where the column values where overridden inappropriately
@@ -66,6 +66,9 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 4. Settings page
 
 == Changelog ==
+
+= Development =
+* Fixed illegal string offset notice
 
 = 1.1.5 =
 * Fixed bug with returning an inappropriate value for "column_value". Thanks to @martindj.
