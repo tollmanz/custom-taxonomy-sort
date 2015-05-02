@@ -24,16 +24,15 @@
 /* This is unnecessary and this is handled in the parent plugin */
 //register_activation_hook( __FILE__, 'simple_term_meta_install' );
 
-function simple_term_meta_install()
-{
+function simple_term_meta_install() {
 	// setup custom table
-	
+
 	global $wpdb;
-		
+
 	$table_name = $wpdb->prefix . 'termmeta';
-	
+
 	if( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name ) :
-	
+
 		$sql = "CREATE TABLE " . $table_name . " (
 		  meta_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		  term_id bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -41,14 +40,14 @@ function simple_term_meta_install()
 		  meta_value longtext,
 		  PRIMARY KEY (meta_id),
 		  KEY term_id (term_id),
-		  KEY meta_key (meta_key)	  
+		  KEY meta_key (meta_key)
 		);";
-		
+
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql);
-		
+
 	endif;
-	
+
 	update_option( "simple_term_meta_db_version", '0.9' );
 }
 
@@ -66,17 +65,16 @@ function simple_post_meta_define_table() {
 /**
  * delete term meta table and db version option upon uninstall
  */
- 
+
 register_uninstall_hook( __FILE__, 'simple_term_meta_uninstall' );
 
-function simple_term_meta_uninstall()
-{
+function simple_term_meta_uninstall() {
 	global $wpdb;
-		
+
 	$table_name = $wpdb->prefix . 'termmeta';
-	
+
 	$wpdb->query("DROP TABLE IF EXISTS $table_name");
-	
+
 	delete_option( "simple_term_meta_db_version" );
 }
 
@@ -161,8 +159,9 @@ function update_term_meta( $term_id, $meta_key, $meta_value, $prev_value = '' ) 
  * @return bool Whether the term meta key was deleted from the database
  */
 function delete_term_meta_by_key($term_meta_key) {
-	if ( !$term_meta_key )
+	if ( !$term_meta_key ) {
 		return false;
+	}
 
 	global $wpdb;
 	$term_ids = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT term_id FROM $wpdb->termmeta WHERE meta_key = %s", $term_meta_key));
@@ -192,8 +191,9 @@ function delete_term_meta_by_key($term_meta_key) {
 function get_term_custom( $term_id ) {
 	$term_id = (int) $term_id;
 
-	if ( ! wp_cache_get($term_id, 'term_meta') )
+	if ( ! wp_cache_get($term_id, 'term_meta') ) {
 		update_termmeta_cache($term_id);
+	}
 
 	return wp_cache_get($term_id, 'term_meta');
 }
@@ -209,11 +209,13 @@ function get_term_custom( $term_id ) {
 function get_term_custom_keys( $term_id ) {
 	$custom = get_term_custom( $term_id );
 
-	if ( !is_array($custom) )
+	if ( !is_array($custom) ) {
 		return;
+	}
 
-	if ( $keys = array_keys($custom) )
+	if ( $keys = array_keys($custom) ) {
 		return $keys;
+	}
 }
 
 /**
@@ -227,11 +229,11 @@ function get_term_custom_keys( $term_id ) {
  * @return array Meta field values.
  */
 function get_term_custom_values( $key = '', $term_id ) {
-	if ( !$key )
+	if ( !$key ) {
 		return null;
+	}
 
 	$custom = get_term_custom($term_id);
 
 	return isset($custom[$key]) ? $custom[$key] : null;
 }
-?>

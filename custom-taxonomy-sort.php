@@ -4,8 +4,8 @@ Plugin Name: Custom Taxonomy Sort
 Plugin URI: http://www.zackdev.com
 Description: Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 Author: Zack Tollman
-Author URI: https://twitter.com/#!/zack_dev
-Version: 1.1.5
+Author URI: https://twitter.com/tollmanz
+Version: 1.1.6
 
 Plugin: Copyright 2011 Zack Tollman (email: zack [at] zackdev [dot] com)
 
@@ -23,11 +23,6 @@ Plugin: Copyright 2011 Zack Tollman (email: zack [at] zackdev [dot] com)
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-// Version check
-global $wp_version;
-$exit_msg = __( "The Custom Taxonomy Sort plugin requires the use of Wordpress 3.0 or higher. Please update!", 'custom-taxonomy-sort' );
-if ( version_compare( $wp_version, "3.0", "<" ) ) exit( $exit_msg );
 
 // Avoid name collision
 if ( ! class_exists( 'CustomTaxonomySort' ) ) :
@@ -71,8 +66,9 @@ class CustomTaxonomySort {
 	 */
 	function __construct() {
 		// Include the Simple Term Meta plugin which is necessary for the UI only if the plugin isn't already installed
-		if ( ! function_exists( 'simple_term_meta_install' ) )
+		if ( ! function_exists( 'simple_term_meta_install' ) ) {
 			include(plugin_dir_path(__FILE__).'/includes/simple-term-meta.php' );
+		}
 
 		// Install the plugin
 		register_activation_hook( __FILE__, array( &$this, 'install' ) );
@@ -81,7 +77,7 @@ class CustomTaxonomySort {
 		$this->process_class_vars();
 
 		// Call taxonomy metadata functions
-		add_action( 'init', array( &$this, 'add_taxonomy_actions' ), 100, 0);
+		add_action( 'init', array( &$this, 'add_taxonomy_actions' ), 100, 0 );
 
 		// Add settings page
 		add_action( 'admin_menu', array( &$this, 'add_settings_actions' ) );
@@ -90,16 +86,16 @@ class CustomTaxonomySort {
 		add_action( 'admin_init', array( &$this, 'settings_init' ) );
 
 		// Apply the filter that changes the sort order
-		add_filter( 'get_terms', array( &$this, 'get_terms' ), 10, 3);
+		add_filter( 'get_terms', array( &$this, 'get_terms' ), 10, 3 );
 
 		// Apply the filter that changes the sort order
-		add_filter( 'wp_get_object_terms', array( &$this, 'wp_get_object_terms' ), 10, 4);
+		add_filter( 'wp_get_object_terms', array( &$this, 'wp_get_object_terms' ), 10, 4 );
 
         // Apply filter for the get_the_terms
-        add_filter( 'get_the_terms', array( &$this, 'get_the_terms' ), 10, 3);
+        add_filter( 'get_the_terms', array( &$this, 'get_the_terms' ), 10, 3 );
 
 		// Apply the filter to catch the custom sort
-		add_filter( 'get_terms_orderby', array( &$this, 'get_terms_orderby' ), 10, 2);
+		add_filter( 'get_terms_orderby', array( &$this, 'get_terms_orderby' ), 10, 2 );
 
 		// Add JS for admin
 		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_scripts' ) );
@@ -133,8 +129,9 @@ class CustomTaxonomySort {
 		// Set initial options if not already set
 		$options['control_type'] = $this->control_types[0]['key'];
 		$options['sort_order'] = $this->sort_orders[0]['key'];
-		if ( ! get_option( $this->options_name ) )
+		if ( ! get_option( $this->options_name ) ) {
 			update_option( $this->options_name, $options );
+		}
 	}
 
 	/**
@@ -271,12 +268,13 @@ class CustomTaxonomySort {
 	 */
 	function save_meta_data( $term_id )	{
 		// Only save the value if it is present and it is a number
-	    if ( isset( $_POST['tax-order'] ) && is_numeric( $_POST['tax-order'] ) )
+	    if ( isset( $_POST['tax-order'] ) && is_numeric( $_POST['tax-order'] ) ) {
 			$order = $_POST['tax-order'];
-		elseif ( $current_order = get_term_meta( $term_id, 'tax-order', true ) )
+		} elseif ( $current_order = get_term_meta( $term_id, 'tax-order', true ) ) {
 			$order = $current_order;
-		else
+		} else {
 			$order = 0;
+		}
 
 		update_term_meta( $term_id, 'tax-order', absint( $order ) );
 	}
@@ -292,7 +290,9 @@ class CustomTaxonomySort {
 	 */
 	function get_terms( $terms, $taxonomies, $args ) {
 		// If the current control type is not automatic, return the terms unless it's explicitly set to be sorted by custom_sort
-		if ( $this->get_control_type() == 'off' && $args['orderby'] != $this->orderby_parameter ) return $terms;
+		if ( $this->get_control_type() == 'off' && $args['orderby'] != $this->orderby_parameter ) {
+			return $terms;
+		}
 
 		// Controls behavior when get_terms is called at unusual times resulting in a terms array without objects
 		$empty = false;
@@ -319,10 +319,11 @@ class CustomTaxonomySort {
 		}
 
 		// Only sort by tax_order if there are items to sort, otherwise return the original array
-		if ( ! $empty && count( $ordered_terms ) > 0)
+		if ( ! $empty && count( $ordered_terms ) > 0 ) {
 			$this->quickSort( $ordered_terms );
-		else
+		} else {
 			return $terms;
+		}
 
 		// By default, the array is sorted ASC; sort DESC if needed
 		if (
@@ -384,10 +385,11 @@ class CustomTaxonomySort {
 	 * @return string New orderby text
 	 */
 	function get_terms_orderby( $orderby, $args ) {
-		if ( $orderby == $this->orderby_parameter )
+		if ( $orderby == $this->orderby_parameter ) {
 			return '';
-		else
+		} else {
 			return $orderby;
+		}
 	}
 
 	/**
@@ -467,7 +469,7 @@ class CustomTaxonomySort {
 	function settings_page() {
 	?>
 		<div class="wrap">
-		<div id="icon-options-general" class="icon32"><br /></div><h2><?php _e( 'Custom Taxonomy Sort Settings', $this->plugin_name ); ?></h2>
+		<h2><?php _e( 'Custom Taxonomy Sort Settings', $this->plugin_name ); ?></h2>
 		<form action="options.php" method="post">
 		<?php settings_fields( 'custom-taxonomy-sort-settings' ); ?>
 		<?php do_settings_sections( 'custom-taxonomy-sort-fields' ); ?>
@@ -511,13 +513,14 @@ class CustomTaxonomySort {
 		}
 
 		// Make sure sort_order is a valid value
-		if ( isset( $input['sort_order'] ) )
-		{
+		if ( isset( $input['sort_order'] ) ) {
 			$valid_sort_order = false;
 			foreach ( $this->sort_orders as $key => $value ) {
 				if ( $value['key'] == $input['sort_order'] ) $valid_sort_order = true;
 			}
-			if ( ! $valid_sort_order ) $input['sort_order'] = $this->sort_orders[0]['key'];
+			if ( ! $valid_sort_order ) {
+				$input['sort_order'] = $this->sort_orders[0]['key'];
+			}
 		}
 		return $input;
 	}
@@ -602,8 +605,9 @@ class CustomTaxonomySort {
 		global $pagenow;
 
 		// Set up form elements in quick edit only on the edit-tags page
-		if ( $pagenow == 'edit-tags.php' )
+		if ( 'edit-tags.php' == $pagenow ) {
 			add_action( 'quick_edit_custom_box', array( &$this, 'quick_edit_custom_box' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -668,8 +672,9 @@ class CustomTaxonomySort {
 	 * @return string Current value of the sort_order setting
 	 */
 	function column_value( $empty = '', $custom_column, $term_id ) {
-        if ( 'order' == $custom_column )
+        if ( 'order' == $custom_column ) {
 		    return get_term_meta( $term_id, 'tax-order', true );
+		}
 	}
 
 	/**

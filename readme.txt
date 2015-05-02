@@ -3,8 +3,8 @@ Contributors: tollmanz
 Donate link: http://www.zackdev.com/
 Tags: taxonomy, category, sort
 Requires at least: 3.1
-Tested up to: 3.3
-Stable tag: 1.1.5
+Tested up to: 4.2.1
+Stable tag: 1.1.6
 
 Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 
@@ -48,11 +48,11 @@ Voila! Now, your terms will only be sorted by the specified order in the places 
 
 = After installation, what do I need to do? =
 
-After installing the plugin, all taxonomies will be automatically sorted by your custom order; however, you need to vist the individual taxonomy term edit pages to enter the order of the terms.
+After installing the plugin, all taxonomies will be automatically sorted by your custom order; however, you need to visit the individual taxonomy term edit pages to enter the order of the terms.
 
 = What is "Automatic Sort" =
 
-"Automatic Sort" has two states: "On" (default) and "Off". When "Autmatic Sort" is set to "On", every call to "get_terms" will be sorted by the custom sort order. In this mode, you do not have to manually add parameters to the "get_terms" function calls to have the terms sorted by the custom sort order. You can think of the "On" state as allowing the plugin to do everything for you; all you need to do is tell it in what order you want the terms to be sorted. On the other hand, if you set "Automatic Sort" to "Off", you need to manually send parameters to the "get_terms" functions in order for the terms to be sorted by the custom sort order. The "Off" mode is best for developers who want absolute control over every time the terms are sorted and displayed.
+"Automatic Sort" has two states: "On" (default) and "Off". When "Automatic Sort" is set to "On", every call to "get_terms" will be sorted by the custom sort order. In this mode, you do not have to manually add parameters to the "get_terms" function calls to have the terms sorted by the custom sort order. You can think of the "On" state as allowing the plugin to do everything for you; all you need to do is tell it in what order you want the terms to be sorted. On the other hand, if you set "Automatic Sort" to "Off", you need to manually send parameters to the "get_terms" functions in order for the terms to be sorted by the custom sort order. The "Off" mode is best for developers who want absolute control over every time the terms are sorted and displayed.
 
 = What is "Sort Order" =
 
@@ -67,8 +67,10 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 
 == Changelog ==
 
-= Development =
+= 1.1.6 =
 * Fixed illegal string offset notice
+* Updated screenshot
+* Minor code standards updates
 
 = 1.1.5 =
 * Fixed bug with returning an inappropriate value for "column_value". Thanks to @martindj.
@@ -103,25 +105,25 @@ After installing the plugin, all taxonomies will be automatically sorted by your
 == Upgrade Notice ==
 
 = 1.1.5 =
-Fixed bug with column values
+* Fixed bug with column values
 
 = 1.1.4 =
-Updated for 3.3 compatibility
+* Updated for 3.3 compatibility
 
 = 1.1.3 =
-Fixed issue where sort may not be applied in certain situations
+* Fixed issue where sort may not be applied in certain situations
 
 = 1.1.2 =
-Works for more taxonomies
+* Works for more taxonomies
 
 = 1.1.1 =
-Small bug fixes
+* Small bug fixes
 
 = 1.1 =
-Added support for Quick Edit
+* Added support for Quick Edit
 
 = 1.0.1 =
-Custom sort is applied in more places
+* Custom sort is applied in more places
 
 = 1.0 =
-Initial release
+* Initial release
