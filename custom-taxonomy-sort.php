@@ -5,7 +5,7 @@ Plugin URI: http://www.zackdev.com
 Description: Custom Taxonomy Sort allows you to explicitly control the sort order of all taxonomy terms.
 Author: Zack Tollman
 Author URI: https://twitter.com/#!/zack_dev
-Version: 1.1.3
+Version: 1.1.5
 
 Plugin: Copyright 2011 Zack Tollman (email: zack [at] zackdev [dot] com)
 
@@ -26,17 +26,16 @@ Plugin: Copyright 2011 Zack Tollman (email: zack [at] zackdev [dot] com)
 
 // Version check
 global $wp_version;
-$exit_msg = __("The Custom Taxonomy Sort plugin requires the use of Wordpress 3.0 or higher. Please update!", 'custom-taxonomy-sort');
-if(version_compare($wp_version, "3.0", "<")) exit($exit_msg);
+$exit_msg = __( "The Custom Taxonomy Sort plugin requires the use of Wordpress 3.0 or higher. Please update!", 'custom-taxonomy-sort' );
+if ( version_compare( $wp_version, "3.0", "<" ) ) exit( $exit_msg );
 
 // Avoid name collision
-if(!class_exists('CustomTaxonomySort')) :
+if ( ! class_exists( 'CustomTaxonomySort' ) ) :
 
 /**
  * CustomTaxonomySort class.
  */
-class CustomTaxonomySort
-{
+class CustomTaxonomySort {
 	/**
 	 * Variable will hold the control types
 	 */
@@ -69,50 +68,46 @@ class CustomTaxonomySort
 
 	/**
 	 * __construct function.
-	 * 
-	 * @access public
-	 * @return void
 	 */
-	function __construct()
-	{
+	function __construct() {
 		// Include the Simple Term Meta plugin which is necessary for the UI only if the plugin isn't already installed
-		if(!function_exists('simple_term_meta_install'))
-			include(plugin_dir_path(__FILE__).'/includes/simple-term-meta.php');
+		if ( ! function_exists( 'simple_term_meta_install' ) )
+			include(plugin_dir_path(__FILE__).'/includes/simple-term-meta.php' );
 
 		// Install the plugin
-		register_activation_hook( __FILE__, array(&$this, 'install'));
+		register_activation_hook( __FILE__, array( &$this, 'install' ) );
 		
 		// Prepare the class variables
 		$this->process_class_vars();
 					
 		// Call taxonomy metadata functions
-		add_action('init', array(&$this, 'add_taxonomy_actions'), 100, 0);
+		add_action( 'init', array( &$this, 'add_taxonomy_actions' ), 100, 0);
 		
 		// Add settings page
-		add_action('admin_menu', array(&$this, 'add_settings_actions'));
+		add_action( 'admin_menu', array( &$this, 'add_settings_actions' ) );
 		
 		// Setup settings fields
-		add_action('admin_init', array(&$this, 'settings_init'));
+		add_action( 'admin_init', array( &$this, 'settings_init' ) );
 		
 		// Apply the filter that changes the sort order
-		add_filter('get_terms', array(&$this, 'get_terms'), 10, 3);
+		add_filter( 'get_terms', array( &$this, 'get_terms' ), 10, 3);
 
 		// Apply the filter that changes the sort order
-		add_filter('wp_get_object_terms', array(&$this, 'wp_get_object_terms'), 10, 4);
+		add_filter( 'wp_get_object_terms', array( &$this, 'wp_get_object_terms' ), 10, 4);
 
         // Apply filter for the get_the_terms
-        add_filter('get_the_terms', array(&$this, 'get_the_terms'), 10, 3);
+        add_filter( 'get_the_terms', array( &$this, 'get_the_terms' ), 10, 3);
 		
 		// Apply the filter to catch the custom sort
-		add_filter('get_terms_orderby', array(&$this, 'get_terms_orderby'), 10, 2);
+		add_filter( 'get_terms_orderby', array( &$this, 'get_terms_orderby' ), 10, 2);
 		
 		// Add JS for admin
-		add_action('admin_enqueue_scripts', array(&$this, 'add_admin_scripts'));
+		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_scripts' ) );
 		
 		// Set up form elements in quick edit
-		add_action('admin_init', array(&$this, 'add_quick_edit_action'));
+		add_action( 'admin_init', array( &$this, 'add_quick_edit_action' ) );
 		
-		//add_filter('posts_clauses', array(&$this, 'order_clauses'), 10, 2);
+		//add_filter( 'posts_clauses', array( &$this, 'order_clauses' ), 10, 2);
 	}
 	
 	/**
@@ -121,8 +116,7 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function CustomTaxonomySort()
-	{
+	function CustomTaxonomySort() {
 		$this->__construct();
 	}
 	
@@ -132,16 +126,15 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function install()
-	{
+	function install() {
 		// Fire the Simple Term Meta installation function on activation
 		simple_term_meta_install();
 		
 		// Set initial options if not already set
 		$options['control_type'] = $this->control_types[0]['key'];
 		$options['sort_order'] = $this->sort_orders[0]['key'];
-		if(!get_option($this->options_name))
-			update_option($this->options_name, $options);
+		if ( ! get_option( $this->options_name ) )
+			update_option( $this->options_name, $options );
 	}
 	
 	/**
@@ -151,17 +144,16 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function process_class_vars()
-	{
+	function process_class_vars() {
 		// Set up control types. First value is the default
 		$this->control_types = array(
 			array(
 				'key' => 'on',
-				'value' => __('On', $this->plugin_name)
+				'value' => __( 'On', $this->plugin_name )
 			),
 			array(
 				'key' => 'off',
-				'value' => __('Off', $this->plugin_name)
+				'value' => __( 'Off', $this->plugin_name )
 			)
 		);
 		
@@ -169,11 +161,11 @@ class CustomTaxonomySort
 		$this->sort_orders = array(
 			array(
 				'key' => 'ASC',
-				'value' => __('Ascending', $this->plugin_name)
+				'value' => __( 'Ascending', $this->plugin_name )
 			),
 			array(
 				'key' => 'DESC',
-				'value' => __('Descending', $this->plugin_name)
+				'value' => __( 'Descending', $this->plugin_name )
 			)
 		);
 	}	
@@ -184,21 +176,19 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function add_taxonomy_actions()
-	{
+	function add_taxonomy_actions() {
 		// Add actions for adding and editing order for all taxonomies
-		foreach(get_taxonomies() as $taxonomy => $name)
-		{				
+		foreach ( get_taxonomies() as $taxonomy => $name ) {
 			// Custom data for taxonomy
-			add_action($name.'_add_form_fields', array(&$this, 'metabox_add'), 10, 1);
-			add_action($name.'_edit_form_fields', array(&$this, 'metabox_edit'), 10, 1);
-			add_action('created_'.$name, array(&$this, 'save_meta_data'), 10, 1);	
-			add_action('edited_'.$name, array(&$this, 'save_meta_data'), 10, 1);
+			add_action( $name.'_add_form_fields', array( &$this, 'metabox_add' ), 10, 1 );
+			add_action( $name.'_edit_form_fields', array( &$this, 'metabox_edit' ), 10, 1 );
+			add_action( 'created_'.$name, array( &$this, 'save_meta_data' ), 10, 1 );
+			add_action( 'edited_'.$name, array( &$this, 'save_meta_data' ), 10, 1 );
 			
 			// Adds columns for taxonomy pages
-			add_filter("manage_edit-{$name}_columns", array(&$this, 'column_header'), 10, 1);
-			//add_filter("manage_edit-{$name}_sortable_columns", array(&$this, 'column_header_sortable'), 10, 1);
-			add_filter("manage_{$name}_custom_column", array(&$this, 'column_value'), 10, 3);
+			add_filter( "manage_edit-{$name}_columns", array( &$this, 'column_header' ), 10, 1 );
+			//add_filter("manage_edit-{$name}_sortable_columns", array( &$this, 'column_header_sortable' ), 10, 1);
+			add_filter( "manage_{$name}_custom_column", array( &$this, 'column_value' ), 10, 3 );
 		}
 	}
 	
@@ -208,31 +198,29 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function add_admin_scripts()
-	{
+	function add_admin_scripts() {
 		global $pagenow;
 		
 		// Only add JS and CSS on the edit-tags page
-		if($pagenow == 'edit-tags.php')
-		{
+		if ( $pagenow == 'edit-tags.php' ) {
 			// Register JS
 			wp_register_script(
 				'custom-taxonomy-sort-js',
-				plugins_url('/js/custom-taxonomy-sort.js', __FILE__),
-				array('jquery'),
+				plugins_url( '/js/custom-taxonomy-sort.js', __FILE__ ),
+				array( 'jquery' ),
 				$this->version
 			);
-			wp_enqueue_script('custom-taxonomy-sort-js');
+			wp_enqueue_script( 'custom-taxonomy-sort-js' );
 			
 			// Register CSS
 			wp_register_style(
 				'custom-taxonomy-sort-css',
-				plugins_url('/css/custom-taxonomy-sort.css', __FILE__),
+				plugins_url( '/css/custom-taxonomy-sort.css', __FILE__ ),
 				false,
 				$this->version,
 				false
 			);
-			wp_enqueue_style('custom-taxonomy-sort-css');
+			wp_enqueue_style( 'custom-taxonomy-sort-css' );
 		}
 	}
 	
@@ -243,13 +231,12 @@ class CustomTaxonomySort
 	 * @param mixed $tag Object with term data
 	 * @return void
 	 */
-	function metabox_add($tag) 
-	{
+	function metabox_add( $tag ) {
 	?>
 		<div class="form-field">
-			<label for="tax-order"><?php _e('Order', $this->plugin_name) ?></label>
+			<label for="tax-order"><?php _e( 'Order', $this->plugin_name ) ?></label>
 			<input name="tax-order" id="tax-order" type="text" value="" size="40" aria-required="true" />
-			<p class="description"><?php _e('Determines the order in which the term is displayed.', $this->plugin_name); ?></p>
+			<p class="description"><?php _e( 'Determines the order in which the term is displayed.', $this->plugin_name ); ?></p>
 		</div>
 	<?php
 	} 	
@@ -261,16 +248,15 @@ class CustomTaxonomySort
 	 * @param mixed $tag Object with term data
 	 * @return void
 	 */	
-	function metabox_edit($tag) 
-	{
+	function metabox_edit( $tag ) {
 	?>
 		<tr class="form-field">
 			<th scope="row" valign="top">
-				<label for="tax-order"><?php _e('Order', $this->plugin_name); ?></label>
+				<label for="tax-order"><?php _e( 'Order', $this->plugin_name ); ?></label>
 			</th>
 			<td>
-				<input name="tax-order" id="tax-order" type="text" value="<?php echo get_term_meta($tag->term_id, 'tax-order', true); ?>" size="40" aria-required="true" />
-				<p class="description"><?php _e('Determines the order in which the term is displayed.', $this->plugin_name); ?></p>
+				<input name="tax-order" id="tax-order" type="text" value="<?php echo get_term_meta( $tag->term_id, 'tax-order', true ); ?>" size="40" aria-required="true" />
+				<p class="description"><?php _e( 'Determines the order in which the term is displayed.', $this->plugin_name ); ?></p>
 			</td>
 		</tr>
 	<?php
@@ -283,17 +269,16 @@ class CustomTaxonomySort
 	 * @param mixed $term_id ID of the term
 	 * @return void
 	 */
-	function save_meta_data($term_id)
-	{
+	function save_meta_data( $term_id )	{
 		// Only save the value if it is present and it is a number
-	    if(isset($_POST['tax-order']) && is_numeric($_POST['tax-order'])) 
+	    if ( isset( $_POST['tax-order'] ) && is_numeric( $_POST['tax-order'] ) )
 			$order = $_POST['tax-order']; 
-		elseif($current_order = get_term_meta($term_id, 'tax-order', true))
+		elseif ( $current_order = get_term_meta( $term_id, 'tax-order', true ) )
 			$order = $current_order;
 		else
 			$order = 0;
 			
-		update_term_meta( $term_id, 'tax-order', $order);     
+		update_term_meta( $term_id, 'tax-order', absint( $order ) );
 	}
 
 	/**
@@ -303,12 +288,11 @@ class CustomTaxonomySort
 	 * @param mixed $terms
 	 * @param mixed $taxonomies
 	 * @param mixed $args
-	 * @return void
+	 * @return int|array
 	 */
-	function get_terms($terms, $taxonomies, $args)
-	{		
+	function get_terms( $terms, $taxonomies, $args ) {
 		// If the current control type is not automatic, return the terms unless it's explicitly set to be sorted by custom_sort
-		if($this->get_control_type() == 'off' && $args['orderby'] != $this->orderby_parameter) return $terms;
+		if ( $this->get_control_type() == 'off' && $args['orderby'] != $this->orderby_parameter ) return $terms;
 	
 		// Controls behavior when get_terms is called at unusual times resulting in a terms array without objects
 		$empty = false;
@@ -318,20 +302,15 @@ class CustomTaxonomySort
 		$unordered_terms = array();
 
 		// Add taxonomy order to terms
-		foreach($terms as $term)
-		{
+		foreach ( $terms as $term ) {
 			// Only set tax_order if value is an object
-			if(is_object($term))
-			{
-				if($taxonomy_sort = get_term_meta($term->term_id, 'tax-order', true))
-				{
-					$term->tax_order = (int) $taxonomy_sort;
+			if ( is_object( $term ) ) {
+				if ( $taxonomy_sort = get_term_meta( $term->term_id, 'tax-order', true ) ) {
+					$term->tax_order = ( int ) $taxonomy_sort;
 					$ordered_terms[] = $term;
-				}
-				else
-				{
+				} else {
 					// This catches any terms that don't have tax-order set
-					$term->tax_order = (int) 0;
+					$term->tax_order = ( int ) 0;
 					$unordered_terms[] = $term;
 				}
 			}
@@ -340,19 +319,19 @@ class CustomTaxonomySort
 		}
 		
 		// Only sort by tax_order if there are items to sort, otherwise return the original array
-		if(!$empty && count($ordered_terms) > 0)
-			$this->quickSort($ordered_terms);
+		if ( ! $empty && count( $ordered_terms ) > 0)
+			$this->quickSort( $ordered_terms );
 		else
 			return $terms;
 
 		// By default, the array is sorted ASC; sort DESC if needed
-		if(
-			($args['orderby'] == $this->orderby_parameter && $args['order'] == 'DESC') ||
+		if ( 
+			($args['orderby'] == $this->orderby_parameter && $args['order'] == 'DESC' ) ||
 			($args['orderby'] != $this->orderby_parameter && $this->get_sort_order() == 'DESC' )
-		) krsort($ordered_terms);
+		) krsort( $ordered_terms );
 
 		// Combine the newly ordered items with the unordered items and return
-		return array_merge($ordered_terms, $unordered_terms);	
+		return array_merge( $ordered_terms, $unordered_terms );
 	}
 	
 	/**
@@ -365,11 +344,10 @@ class CustomTaxonomySort
 	 * @param mixed $args
      * @return array Array of sorted object terms
 	 */
-	function wp_get_object_terms($terms, $object_ids, $taxonomies, $args)
-	{
+	function wp_get_object_terms( $terms, $object_ids, $taxonomies, $args ) {
 		// At this point, the $object_ids have already been used to get terms associated with the desired objects
 		// As such, the resulting terms just need to be run through the custom sorting routine
-		return $this->get_terms($terms, $taxonomies, $args);
+		return $this->get_terms( $terms, $taxonomies, $args );
 	}
 
     /**
@@ -380,9 +358,8 @@ class CustomTaxonomySort
      * @param $taxonomy string Taxonomy of terms
      * @return array Array of sorted object terms
      */
-    function get_the_terms($terms, $id, $taxonomy)
-    {
-        return $this->get_terms($terms, $taxonomy, $this->orderby_parameter);
+    function get_the_terms( $terms, $id, $taxonomy ) {
+        return $this->get_terms( $terms, $taxonomy, $this->orderby_parameter );
     }
 
 	/**
@@ -396,9 +373,8 @@ class CustomTaxonomySort
 	 * @param $args array
 	 * @return string New orderby text
 	 */
-	function get_terms_orderby($orderby, $args)
-	{
-		if($orderby == $this->orderby_parameter) 
+	function get_terms_orderby( $orderby, $args ) {
+		if ( $orderby == $this->orderby_parameter )
 			return '';
 		else
 			return $orderby;
@@ -412,29 +388,25 @@ class CustomTaxonomySort
 	 * @param mixed &$array
 	 * @return void
 	 */
-	function quickSort(&$array)
-	{
+	function quickSort( &$array ) {
 		$cur = 1;
 		$stack[1]['l'] = 0;
-		$stack[1]['r'] = count($array)-1;
+		$stack[1]['r'] = count( $array ) - 1;
 		
-		do
-		{
+		do {
 			$l = $stack[$cur]['l'];
 			$r = $stack[$cur]['r'];
 			$cur--;
 		
-			do
-			{
+			do {
 				$i = $l;
 				$j = $r;
-				$tmp = $array[(int)( ($l+$r)/2 )];
+				$tmp = $array[ ( int )( ( $l + $r ) / 2 ) ];
 			
 				// partion the array in two parts.
 				// left from $tmp are with smaller values,
 				// right from $tmp are with bigger ones
-				do
-				{
+				do {
 					while( $array[$i]->tax_order < $tmp->tax_order )
 					$i++;
 				
@@ -442,8 +414,7 @@ class CustomTaxonomySort
 				 	$j--;
 				
 					// swap elements from the two sides
-					if( $i <= $j)
-					{
+					if (  $i <= $j ) {
 						 $w = $array[$i];
 						 $array[$i] = $array[$j];
 						 $array[$j] = $w;
@@ -452,19 +423,18 @@ class CustomTaxonomySort
 				 		$j--;
 					}
 				
-				}while( $i <= $j );
+				} while ( $i <= $j );
 				
-				if( $i < $r )
-				{
+				if (  $i < $r ) {
 					$cur++;
 					$stack[$cur]['l'] = $i;
 					$stack[$cur]['r'] = $r;
 				}
 				$r = $j;
 				
-			}while( $l < $r );
+			} while ( $l < $r );
 				
-		}while( $cur != 0 );
+		} while ( $cur != 0 );
 	}
 
 	/**
@@ -473,10 +443,9 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function add_settings_actions()
-	{
+	function add_settings_actions() {
 		// Add the options page
-		add_submenu_page('options-general.php', __('Custom Taxonomy Sort Settings', $this->plugin_name), __('Custom Taxonomy Sort', $this->plugin_name), 'manage_options', 'custom-taxonomy-sort-settings', array(&$this, 'settings_page'));	
+		add_submenu_page( 'options-general.php', __( 'Custom Taxonomy Sort Settings', $this->plugin_name ), __( 'Custom Taxonomy Sort', $this->plugin_name ), 'manage_options', 'custom-taxonomy-sort-settings', array( &$this, 'settings_page' ) );
 	}
 
 	/**
@@ -485,15 +454,14 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function settings_page() 
-	{
+	function settings_page() {
 	?>
 		<div class="wrap"> 
-		<div id="icon-options-general" class="icon32"><br /></div><h2><?php _e('Custom Taxonomy Sort Settings', $this->plugin_name); ?></h2>
+		<div id="icon-options-general" class="icon32"><br /></div><h2><?php _e( 'Custom Taxonomy Sort Settings', $this->plugin_name ); ?></h2>
 		<form action="options.php" method="post">
-		<?php settings_fields('custom-taxonomy-sort-settings'); ?>
-		<?php do_settings_sections('custom-taxonomy-sort-fields'); ?>
-		<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="<?php _e('Save Changes', $this->plugin_name); ?>" /></p>
+		<?php settings_fields( 'custom-taxonomy-sort-settings' ); ?>
+		<?php do_settings_sections( 'custom-taxonomy-sort-fields' ); ?>
+		<p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="<?php _e( 'Save Changes', $this->plugin_name ); ?>" /></p>
 		</form></div>
 	<?php
 	}
@@ -504,16 +472,15 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function settings_init()
-	{
-		register_setting('custom-taxonomy-sort-settings', $this->options_name, array(&$this, 'settings_validate'));
-		add_settings_section('custom-taxonomy-sort-options', __('General', $this->plugin_name), array(&$this, 'settings_page_text'), 'custom-taxonomy-sort-fields');
+	function settings_init() {
+		register_setting( 'custom-taxonomy-sort-settings', $this->options_name, array( &$this, 'settings_validate' ) );
+		add_settings_section( 'custom-taxonomy-sort-options', __( 'General', $this->plugin_name ), array( &$this, 'settings_page_text' ), 'custom-taxonomy-sort-fields' );
 		
 		// Add control types inputs
-		add_settings_field('custom-taxonomy-sort-control-type', __('Automatic Sort', $this->plugin_name), array(&$this, 'control_type_string'), 'custom-taxonomy-sort-fields', 'custom-taxonomy-sort-options');
+		add_settings_field( 'custom-taxonomy-sort-control-type', __( 'Automatic Sort', $this->plugin_name ), array( &$this, 'control_type_string' ), 'custom-taxonomy-sort-fields', 'custom-taxonomy-sort-options' );
 		
 		// Add sort orders inputs
-		add_settings_field('custom-taxonomy-sort-orders', __('Sort Order', $this->plugin_name), array(&$this, 'sort_orders_string'), 'custom-taxonomy-sort-fields', 'custom-taxonomy-sort-options');
+		add_settings_field( 'custom-taxonomy-sort-orders', __( 'Sort Order', $this->plugin_name ), array( &$this, 'sort_orders_string' ), 'custom-taxonomy-sort-fields', 'custom-taxonomy-sort-options' );
 	}
 	
 	/**
@@ -521,28 +488,26 @@ class CustomTaxonomySort
 	 *
 	 * @access public
 	 * @param $input array Values that will be sent to the database
-	 * @return void
+	 * @return array
 	 */
-	function settings_validate($input)
-	{
+	function settings_validate( $input ) {
 		// Make sure control_type is a valid value
-		if(isset($input['control_type']))
-		{
+		if ( isset( $input['control_type'] ) ) {
 			$valid_control_type = false;
-			foreach($this->control_types as $key => $value) {
-				if($value['key'] == $input['control_type']) $valid_control_type = true;
+			foreach ( $this->control_types as $key => $value ) {
+				if ( $value['key'] == $input['control_type'] ) $valid_control_type = true;
 			}
-			if(!$valid_control_type) $input['control_type'] = $this->control_type_default[0]['key'];
+			if ( ! $valid_control_type ) $input['control_type'] = $this->control_type_default[0]['key'];
 		}
 
 		// Make sure sort_order is a valid value
-		if(isset($input['sort_order']))
+		if ( isset( $input['sort_order'] ) )
 		{
 			$valid_sort_order = false;
-			foreach($this->sort_orders as $key => $value) {
-				if($value['key'] == $input['sort_order']) $valid_sort_order = true;
+			foreach ( $this->sort_orders as $key => $value ) {
+				if ( $value['key'] == $input['sort_order'] ) $valid_sort_order = true;
 			}
-			if(!$valid_sort_order) $input['sort_order'] = $this->sort_orders[0]['key'];
+			if ( ! $valid_sort_order ) $input['sort_order'] = $this->sort_orders[0]['key'];
 		}
 		return $input;
 	}
@@ -553,10 +518,9 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function settings_page_text()
-	{
+	function settings_page_text() {
 	?>
-		<p><?php _e('Sort Management', $this->plugin_name); ?></p>
+		<p><?php _e( 'Sort Management', $this->plugin_name ); ?></p>
 	<?php
 	}
 	
@@ -566,14 +530,13 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function control_type_string()
-	{
+	function control_type_string() {
 		// Get the current control type setting
 		$current_control_type = $this->get_control_type();
 	?>
-		<fieldset><legend class="screen-reader-text"><span><?php _e('Control Type', $this->plugin_name); ?></span></legend> 
-		<?php foreach ($this->control_types as $key => $value) : ?>
-			<label title="<?php echo $value['key']; ?>"><input type="radio" name="custom-taxonomy-sort-settings[control_type]" value="<?php echo $value['key']; ?>" <?php if($current_control_type == $value['key']) : ?>checked='checked'<?php endif; ?> /> <span><?php echo $value['value']; ?></span></label><br />
+		<fieldset><legend class="screen-reader-text"><span><?php _e( 'Control Type', $this->plugin_name ); ?></span></legend>
+		<?php foreach ( $this->control_types as $key => $value ) : ?>
+			<label title="<?php echo $value['key']; ?>"><input type="radio" name="custom-taxonomy-sort-settings[control_type]" value="<?php echo $value['key']; ?>" <?php if ( $current_control_type == $value['key'] ) : ?>checked='checked'<?php endif; ?> /> <span><?php echo $value['value']; ?></span></label><br />
 		<?php endforeach; ?>
 		</fieldset>
 	<?php
@@ -585,14 +548,13 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return void
 	 */
-	function sort_orders_string()
-	{
+	function sort_orders_string() {
 		// Get the current control type setting
 		$current_control_type = $this->get_sort_order();
 	?>
-		<fieldset><legend class="screen-reader-text"><span><?php _e('Sort Order', $this->plugin_name); ?></span></legend> 
-		<?php foreach ($this->sort_orders as $key => $value) : ?>
-			<label title="<?php echo $value['key']; ?>"><input type="radio" name="custom-taxonomy-sort-settings[sort_order]" value="<?php echo $value['key']; ?>" <?php if($current_control_type == $value['key']) : ?>checked='checked'<?php endif; ?> /> <span><?php echo $value['value']; ?></span></label><br />
+		<fieldset><legend class="screen-reader-text"><span><?php _e( 'Sort Order', $this->plugin_name ); ?></span></legend>
+		<?php foreach ( $this->sort_orders as $key => $value ) : ?>
+			<label title="<?php echo $value['key']; ?>"><input type="radio" name="custom-taxonomy-sort-settings[sort_order]" value="<?php echo $value['key']; ?>" <?php if ( $current_control_type == $value['key'] ) : ?>checked='checked'<?php endif; ?> /> <span><?php echo $value['value']; ?></span></label><br />
 		<?php endforeach; ?>
 		</fieldset>
 	<?php
@@ -604,9 +566,8 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return string Current value of the control_type setting
 	 */
-	function get_control_type()
-	{
-		$options = get_option($this->options_name);
+	function get_control_type() {
+		$options = get_option( $this->options_name );
 		return $options['control_type'];
 	}
 	
@@ -616,9 +577,8 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return string Current value of the sort_order setting
 	 */
-	function get_sort_order()
-	{
-		$options = get_option($this->options_name);
+	function get_sort_order() {
+		$options = get_option( $this->options_name );
 		return $options['sort_order'];
 	}
 	
@@ -628,13 +588,12 @@ class CustomTaxonomySort
 	 * @access public
 	 * @return none
 	 */
-	function add_quick_edit_action()
-	{
+	function add_quick_edit_action() {
 		global $pagenow;
 		
 		// Set up form elements in quick edit only on the edit-tags page
-		if($pagenow == 'edit-tags.php')
-			add_action('quick_edit_custom_box', array(&$this, 'quick_edit_custom_box'), 10, 3);	
+		if ( $pagenow == 'edit-tags.php' )
+			add_action( 'quick_edit_custom_box', array( &$this, 'quick_edit_custom_box' ), 10, 3 );
 	}	
 	
 	/**
@@ -644,9 +603,8 @@ class CustomTaxonomySort
 	 * @param $columns array
 	 * @return array
 	 */
-	function column_header($columns)
-	{
-		$columns['order'] = __('Order', $this->plugin_name);
+	function column_header( $columns ) {
+		$columns['order'] = __( 'Order', $this->plugin_name );
 		return $columns;
 	}
 
@@ -657,8 +615,7 @@ class CustomTaxonomySort
 	 * @param $columns array
 	 * @return array
 	 */
-	function column_header_sortable($columns)
-	{
+	function column_header_sortable( $columns ) {
 		$columns['order'] = 'order';
 		return $columns;
 	}
@@ -671,12 +628,10 @@ class CustomTaxonomySort
 	 * @param $wp_query array
 	 * @return array
 	 */
-	function order_clauses($clauses, $wp_query)
-	{
+	function order_clauses( $clauses, $wp_query ) {
 		global $wpdb;
 
-		if(isset($wp_query->query['orderby']) && 'order' == $wp_query->query['orderby']) 
-		{
+		if ( isset( $wp_query->query['orderby'] ) && 'order' == $wp_query->query['orderby'] ) {
 			
 			$clauses['join'] .= "
 		LEFT OUTER JOIN {$wpdb->term_relationships} ON {$wpdb->posts}.ID={$wpdb->term_relationships}.object_id
@@ -687,7 +642,7 @@ class CustomTaxonomySort
 			$clauses['where'] .= " AND (taxonomy = 'color' OR taxonomy IS NULL)";
 			$clauses['groupby'] = "object_id";
 			$clauses['orderby']  = "GROUP_CONCAT({$wpdb->terms}.name ORDER BY name ASC) ";
-			$clauses['orderby'] .= ( 'ASC' == strtoupper( $wp_query->get('order') ) ) ? 'ASC' : 'DESC';
+			$clauses['orderby'] .= ( 'ASC' == strtoupper( $wp_query->get( 'order' ) ) ) ? 'ASC' : 'DESC';
 		}
 		
 		return $clauses;
@@ -702,9 +657,9 @@ class CustomTaxonomySort
 	 * @param $term_id int
 	 * @return string Current value of the sort_order setting
 	 */
-	function column_value($empty = '', $custom_column, $term_id) 
-	{
-		return get_term_meta($term_id, 'tax-order', true);		
+	function column_value( $empty = '', $custom_column, $term_id ) {
+        if ( 'order' == $custom_column )
+		    return get_term_meta( $term_id, 'tax-order', true );
 	}
 	
 	/**
@@ -716,17 +671,16 @@ class CustomTaxonomySort
 	 * @param $tax string
 	 * @return string Current value of the sort_order setting
 	 */
-	function quick_edit_custom_box($column_name, $screen, $name)
-	{	
+	function quick_edit_custom_box( $column_name, $screen, $name ) {
 		// The link_category pages will cause this function to be called twice, outputting two separate fieldsets.
 		// This statement keeps it from printing out the call for the "links" column.
 		// This occurs because "links" is not considered a core column and thus, this filter runs on it 
 		// around line 359 of class-wp-terms-list-table.php
-		if($column_name == 'order') :
+		if ( $column_name == 'order' ) :
 	?>
 		<fieldset><div class="inline-edit-col">
 			<label>
-				<span class="title"><?php _e('Order'); ?></span>
+				<span class="title"><?php _e( 'Order' ); ?></span>
 				<span class="input-text-wrap"><input type="text" name="tax-order" class="ptitle" value=""></span>
 			</label>
 		</div></fieldset>
@@ -735,9 +689,8 @@ class CustomTaxonomySort
 }
 
 else :
-	exit(__('Class CustomTaxonomySort already exists.', 'custom-taxonomy-sort'));
+	exit(__( 'Class CustomTaxonomySort already exists.', 'custom-taxonomy-sort' ) );
 endif;
 
 // Instantiate the class
 $CustomTaxonomySort = new CustomTaxonomySort();
-?>
